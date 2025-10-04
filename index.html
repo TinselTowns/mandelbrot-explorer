@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mandelbrot Set Visualisation</title>
+</head>
+  <style>
+    body { 
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; 
+      padding: 32px; 
+      line-height: 1.5; 
+      color: #111; 
+      background: #f7fbff; 
+    }
+
+    .main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;              
+      margin-top: 20px;
+    }
+
+    .zoom-controls {
+      grid-column: span 3;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .card { 
+      background: white; 
+      border-radius: 12px; 
+      padding: 24px; 
+      max-width: 800px; 
+      box-shadow: 0 6px 20px rgba(20,30,60,0.08); 
+    }
+    h1 { 
+      margin: 0 0 8px 0; 
+      font-size: 1.6rem; 
+    }
+    p.lead { 
+      margin: 0 0 16px 0; 
+      color: #334155; 
+    }
+    code { 
+      background: #0f172a10; 
+      padding: 2px 6px; 
+      border-radius: 6px; 
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, "Roboto Mono", monospace; 
+    }
+    .math { 
+      font-weight: 600; 
+      color: #0b3b66; 
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, 60px);
+      grid-gap: 8px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px;
+      border: none;
+      background: #1e293b;
+      color: white;
+      font-size: 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #334155; }
+    button:active { background: #475569; }
+
+    .zoom-controls {
+      grid-column: span 3;
+      text-align: center;
+      margin-top: 10px;
+    }
+  </style>
+<body>
+  <h1>Mandelbrot Set Visualisation</h1>
+  The <strong>Mandelbrot set</strong> is the set of complex numbers <code>c</code> for which the sequence defined by
+      <span class="math">z<sub>n+1</sub> = z<sub>n</sub><sup>2</sup> + c</span> with <code>z<sub>0</sub> = 0</code> remains bounded (does not diverge to infinity).
+    </p>
+
+    <p>
+      In other words: for each complex number <code>c</code>, start with <code>z = 0</code> and keep applying <code>z ← z² + c</code>.
+      If the values never run off to infinity (they stay within some finite distance), then <code>c</code> belongs to the Mandelbrot set.
+    </p>
+ <div class="main">
+  <canvas id="myCanvas" width="1200" height="800"></canvas>
+
+  <div class="controls">
+    <div></div>
+    <button id="up" onmousedown="goUp()">↑</button>
+    <div></div>
+
+    <button id="left" onmousedown="goLeft()">←</button>
+    <button id="zoomIn" onmousedown="zoomIn()">+</button>
+    <button id="right" onmousedown="goRight()">→</button>
+
+    <div></div>
+    <button id="down" onmousedown="goDown()">↓</button>
+    <div></div>
+
+    <div class="zoom-controls">
+      <button id="zoomOut" onmousedown="zoomOut()">−</button>
+      <button id="saveImage">💾 Save</button>
+    </div>
+    
+
+  </div>
+</div>
+  <br>
+  <p>Choose style</p>
+  <button id="classic" onclick="setPallete('classic')">Classic</button>
+  <button id="black" onclick="setPallete('black')">Black</button>
+  <button id="cosmos" onclick="setPallete('cosmos')">Cosmos</button>
+  <button id="fire" onclick="setPallete('fire')">Fire</button>
+  <button id="light_blue" onclick="setPallete('light_blue')">Light Blue</button>
+  <script>
+    const width = 1200;
+    const height = 800;
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    let style = "classic";
+    const pixelSize = 1;
+    let scale = 3;
+    let center_x = -0.5;
+    let center_y = 0.0;
+    console.log("Hello, fractals!");
+
+    function drawFractal(){
+      for(let x=0; x<width; x+=pixelSize){
+          for(let y=0; y<height; y+=pixelSize){
+              let x_c = center_x+(x-width/2)/width*scale;
+              let y_c = center_y+(y-height/2)/height*scale;
+              let count = 0;
+              let x_n = 0;
+              let y_n = 0;
+              while(count<200 && x_n*x_n+y_n*y_n<4){
+                  temp = x_n*x_n - y_n*y_n + x_c;
+                  y_n = 2*x_n*y_n + y_c;
+                  x_n = temp;
+                  count++;
+              }
+              
+ 
+              ctx.fillStyle = getColor(style, count);
+              ctx.fillRect(x, y, pixelSize, pixelSize);
+          }
+      }
+    }
+
+    function goLeft(){
+      center_x-=scale*0.1;
+      drawFractal();
+    }
+
+    function goRight(){
+      center_x+=scale*0.1;
+      drawFractal();
+    }
+
+    function goUp(){
+      center_y+=scale*0.1;
+      drawFractal();
+    }
+
+    function goDown(){
+      center_y-=scale*0.1;
+      drawFractal();
+    }
+
+    function zoomIn(){
+      scale/=2;
+      drawFractal();
+    }
+
+    function zoomOut(){
+      scale*=2;
+      drawFractal();
+    }
+
+    function getColor(color, count){
+      
+      let t = count/200;
+      if(color=="black"){
+        if (count == 200) return "black";
+        let r = Math.round(0   + t * 173);
+        let g = Math.round(0   + t * 216);
+        let b = Math.round(0   + t * 230);
+        return `rgb(${r},${g},${b})`;
+      }
+      if(color=="light_blue"){
+        let r = Math.round(0   + t * 173);
+        let g = Math.round(0   + t * 216);
+        let b = Math.round(0   + t * 230);
+        return `rgb(${r},${g},${b})`;
+      }
+      if(color=="cosmos"){
+      if (count == 200) return "black";
+        let r = Math.round(80 + 80 * t);   // 80 → 160
+        let g = Math.round(0 + 20 * (1 - t)); // small green for depth
+        let b = Math.round(80 + 80 * (1 - t)); // 160 → 80
+        return `rgb(${r},${g},${b})`;
+      }
+      if(color=="fire"){
+        if (count == 200) return "black";
+        let hue = Math.floor(360 * t);
+        return `hsl(${hue}, 100%, 50%)`;
+      }
+      if(color=="classic"){
+        if (count == 200) return "black";
+        return "white";
+      }
+    }
+
+    function setPallete(name){
+      style = name;
+      drawFractal();
+    }
+
+    document.getElementById("saveImage").addEventListener("click", () => {
+      const link = document.createElement("a");
+      link.download = "mandelbrot.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    });
+
+
+    drawFractal();
+  </script>
+
+</body>
+</html>
