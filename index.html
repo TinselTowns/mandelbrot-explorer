@@ -166,12 +166,12 @@
     }
 
     function goUp(){
-      center_y+=scale*0.1;
+      center_y-=scale*0.1;
       drawFractal();
     }
 
     function goDown(){
-      center_y-=scale*0.1;
+      center_y+=scale*0.1;
       drawFractal();
     }
 
@@ -190,15 +190,15 @@
       let t = count/200;
       if(color=="black"){
         if (count == 200) return "black";
-        let r = Math.round(0   + t * 173);
-        let g = Math.round(0   + t * 216);
-        let b = Math.round(0   + t * 230);
+        let r = Math.round(t * 173);
+        let g = Math.round(t * 216);
+        let b = Math.round(t * 230);
         return `rgb(${r},${g},${b})`;
       }
       if(color=="light_blue"){
-        let r = Math.round(0   + t * 173);
-        let g = Math.round(0   + t * 216);
-        let b = Math.round(0   + t * 230);
+        let r = Math.round(t * 173);
+        let g = Math.round(t * 216);
+        let b = Math.round(t * 230);
         return `rgb(${r},${g},${b})`;
       }
       if(color=="cosmos"){
