@@ -139,16 +139,16 @@
               let x_c = center_x+(x-width/2)/width*scale;
               let y_c = center_y+(y-height/2)/height*scale;
               let count = 0;
-              let x_n = 0;
-              let y_n = 0;
-              while(count<200 && x_n*x_n+y_n*y_n<4){
-                  temp = x_n*x_n - y_n*y_n + x_c;
-                  y_n = 2*x_n*y_n + y_c;
-                  x_n = temp;
+              let x_n = 0, y_n = 0, x_a = 0, y_a = 0;
+
+              while(count<200 && x_n+y_n<=4){
+                  y_a = 2*x_a*y_a + y_c;
+                  x_a = x_n-y_n + x_c;
+                  x_n = x_a*x_a;
+                  y_n = y_a*y_a;
                   count++;
               }
               
- 
               ctx.fillStyle = getColor(style, count);
               ctx.fillRect(x, y, pixelSize, pixelSize);
           }
@@ -203,9 +203,9 @@
       }
       if(color=="cosmos"){
       if (count == 200) return "black";
-        let r = Math.round(80 + 80 * t);   // 80 → 160
-        let g = Math.round(0 + 20 * (1 - t)); // small green for depth
-        let b = Math.round(80 + 80 * (1 - t)); // 160 → 80
+        let r = Math.round(80 + 80 * t);
+        let g = Math.round(20 * (1 - t));
+        let b = Math.round(80 + 80 * (1 - t)); 
         return `rgb(${r},${g},${b})`;
       }
       if(color=="fire"){
